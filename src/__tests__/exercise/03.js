@@ -2,16 +2,17 @@
 // http://localhost:3000/counter
 
 import * as React from 'react'
-// 🐨 add `screen` to the import here:
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import Counter from '../../components/counter'
 
 test('counter increments and decrements when the buttons are clicked', () => {
-  const {container} = render(<Counter />)
-  // 🐨 replace these with screen queries
-  // 💰 you can use `getByText` for each of these (`getByRole` can work for the button too)
-  const [decrement, increment] = container.querySelectorAll('button')
-  const message = container.firstChild.querySelector('div')
+  render(<Counter />)
+  // get elements using screen queries
+  // /name/i < make it case insensitive
+  // now order of buttons can change
+  const increment = screen.getByRole('button', {name: /increment/i})
+  const decrement = screen.getByRole('button', {name: /decrement/i})
+  const message = screen.getByText(/current count/i)
 
   expect(message).toHaveTextContent('Current count: 0')
   fireEvent.click(increment)
