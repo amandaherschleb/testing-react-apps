@@ -3,12 +3,9 @@
 
 import * as React from 'react'
 import { render, fireEvent } from '@testing-library/react'
+// dont need this import in each file becuase its in jest.config.js OR add to setupTests.js file for create react apps
+// import '@testing-library/jest-dom/extend-expect'
 import Counter from '../../components/counter'
-
-// React Testing Library does this automatically! So we dont need this anymore!
-// beforeEach(() => {
-//   document.body.innerHTML = ''
-// })
 
 test('counter increments and decrements when the buttons are clicked', () => {
 
@@ -17,12 +14,13 @@ test('counter increments and decrements when the buttons are clicked', () => {
 
   const [decrement, increment] = container.querySelectorAll('button')
   const message = container.firstChild.querySelector('div')
-  expect(message.textContent).toBe('Current count: 0')
+  // best to use jest dom assertions > checkout their docs for more options than 'toHaveTextContent'
+  expect(message).toHaveTextContent('Current count: 0')
 
   // fireEvent has lots of options to choose from besides click
   fireEvent.click(increment)
-  expect(message.textContent).toBe('Current count: 1')
+  expect(message).toHaveTextContent('Current count: 1')
 
   fireEvent.click(decrement)
-  expect(message.textContent).toBe('Current count: 0')
+  expect(message).toHaveTextContent('Current count: 0')
 })
