@@ -5,8 +5,8 @@ import * as React from 'react'
 import {render, screen, waitForElementToBeRemoved} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {build, fake} from '@jackfranklin/test-data-bot'
-import {rest} from 'msw'
 import { setupServer } from 'msw/node'
+import { handlers } from 'test/server-handlers'
 import Login from '../../components/login-submission'
 
 const buildLoginForm = build({
@@ -17,21 +17,8 @@ const buildLoginForm = build({
 })
 
 // 📜 https://mswjs.io/ for info on setupServer
-const server = setupServer(
-  rest.post(
-    'https://auth-provider.example.com/api/login',
-    async (req, res, context) => {
-      // simulate the backend so make sure it responds with all cases
-      if (!req.body.password) {
-        return res(context.status(400), context.json({message: 'password is required'}))
-      }
-      if (!req.body.username) {
-        return res(context.status(400), context.json({message: 'username is required'}))
-      }
-      return res(context.json({username: req.body.username}))
-    }
-  )
-)
+// use all handlers from shared file
+const server = setupServer(...handlers)
 
 beforeAll(() => {
   server.listen()
