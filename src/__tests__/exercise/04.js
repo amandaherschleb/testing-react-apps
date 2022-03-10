@@ -8,9 +8,7 @@ import Login from '../../components/login'
 
 test('submitting the form calls onSubmit with username and password', () => {
 
-  let submittedData
-  const handleSubmit = data => (submittedData = data)
-
+  const handleSubmit = jest.fn()
   render(<Login onSubmit={handleSubmit} />)
   // see what the component looks like:
   // screen.debug()
@@ -26,7 +24,7 @@ test('submitting the form calls onSubmit with username and password', () => {
   const submit = screen.getByRole('button', {name: /submit/i})
   userEvent.click(submit)
 
-  expect(submittedData).toEqual({
+  expect(handleSubmit).toBeCalledWith({
     username,
     password
   })
