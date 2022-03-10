@@ -20,16 +20,27 @@ test('counter increments and decrements when the buttons are clicked', () => {
 
   // find element
   const message = div.firstChild.querySelector('div')
-  // console.log(message.textContent)
   
   // verify text
   expect(message.textContent).toBe("Current count: 0")
 
   // desctructure decrement is the first button
   const [decrement, increment] = div.querySelectorAll("button")
-  increment.click()
+
+  const incrementClickEvent = new MouseEvent("click", {
+    bubbles: true,
+    cancelable: true,
+    button: 0  // left click
+  })
+  increment.dispatchEvent(incrementClickEvent)
   expect(message.textContent).toBe("Current count: 1")
 
-  decrement.click()
+  
+  const decrementClickEvent = new MouseEvent("click", {
+    bubbles: true,
+    cancelable: true,
+    button: 0  // left click
+  })
+  decrement.dispatchEvent(decrementClickEvent)
   expect(message.textContent).toBe("Current count: 0")
 })
