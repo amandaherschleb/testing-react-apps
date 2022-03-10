@@ -21,6 +21,13 @@ const server = setupServer(
   rest.post(
     'https://auth-provider.example.com/api/login',
     async (req, res, context) => {
+      // simulate the backend so make sure it responds with all cases
+      if (!req.body.password) {
+        return res(context.status(400), context.json({message: 'password is required'}))
+      }
+      if (!req.body.username) {
+        return res(context.status(400), context.json({message: 'username is required'}))
+      }
       return res(context.json({username: req.body.username}))
     }
   )
