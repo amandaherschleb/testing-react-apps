@@ -4,16 +4,16 @@
 import * as React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import faker from 'faker'
+import { build, fake } from '@jackfranklin/test-data-bot'
 import Login from '../../components/login'
 
-// make reusable util to get login info
-function buildLoginForm() {
-  return {
-    username: faker.internet.userName(),
-    password: faker.internet.password()
+// alternate way to setup reusable mock data
+const buildLoginForm = build({
+  fields: {
+    username: fake(faker => faker.internet.userName()),
+    passwored: fake(faker => faker.internet.password())
   }
-}
+})
 
 test('submitting the form calls onSubmit with username and password', () => {
 
