@@ -5,6 +5,7 @@ import * as React from 'react'
 import {render, screen, waitForElementToBeRemoved} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {build, fake} from '@jackfranklin/test-data-bot'
+import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import {handlers} from 'test/server-handlers'
 import Login from '../../components/login-submission'
@@ -22,6 +23,11 @@ const server = setupServer(...handlers)
 
 beforeAll(() => {
   server.listen()
+})
+
+// reset in case you overwrote the server in one of the tests
+afterEach(() => {
+  server.resetHandlers()
 })
 
 afterAll(() => {
@@ -62,4 +68,25 @@ test(`omitting password results in an error`, async () => {
   expect(screen.getByRole('alert').textContent).toMatchInlineSnapshot(
     `"password required"`,
   )
+})
+
+test('unknown server error displays the error message', async () => {
+  const testErrorMessage = 'Oh no something bad happened'
+  // make the server return an error instead
+  server.use(
+    rest.post(
+      'https://auth-provider.example.com/api/login',
+      async (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({message: testErrorMessage}))
+      },
+    ),
+  )
+
+  render(<Login />)
+  userEvent.click(screen.getByRole('button', {name: /submit/i}))
+
+  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
+
+  // not dependent on the code, message was defined here so we can use toHaveTextContent
+  expect(screen.getByRole('alert')).toHaveTextContent(testErrorMessage)
 })
