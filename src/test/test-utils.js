@@ -1,3 +1,5 @@
+// better to do all this importing and rendering in a shared util file
+// since all components share the providers
 import * as React from 'react'
 import {render as rtlRender} from '@testing-library/react'
 import {ThemeProvider} from 'components/theme'
