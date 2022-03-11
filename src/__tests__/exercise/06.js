@@ -3,8 +3,12 @@
 
 import * as React from 'react'
 import {render, screen, act} from '@testing-library/react'
+// import same as react component file
+import { useCurrentPosition } from 'react-use-geolocation'
 import Location from '../../examples/location'
-import { fake } from 'faker'
+
+// auto creates a jest mock funciton for all function exports
+jest.mock('react-use-geolocation')
 
 // set window.navigator.geolocation to an object that has a getCurrentPosition mock function
 beforeAll(() => {
@@ -12,16 +16,6 @@ beforeAll(() => {
     getCurrentPosition: jest.fn()
   }
 })
-
-// this util allows you to create a promise that you can resolve/reject on demand.
-function deferred() {
-  let resolve, reject
-  const promise = new Promise((res, rej) => {
-    resolve = res
-    reject = rej
-  })
-  return {promise, resolve, reject}
-}
 
 test('displays the users current location', async () => {
 
@@ -32,27 +26,26 @@ test('displays the users current location', async () => {
       longitude: 139
     }
   }
-  const {promise, resolve} = deferred();
-  // Mock the geolocation's getCurrentPosition function and return expected data
-  // To mock something you need to know its API and simulate that in your mock:
-  // 📜 https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
-  window.navigator.geolocation.getCurrentPosition.mockImplementation(
-    callback => { 
-      promise.then(() => callback(fakePosition))
-    }
-  )
+
+  // mock implementation of setting state and returning the value
+  let setReturnValue
+  function useMockCurrentPosition() {
+    const [state, setState] = React.useState([])
+    setReturnValue = setState
+    return state
+  }
+  useCurrentPosition.mockImplementation(useMockCurrentPosition)
 
   render(<Location />)
   // confirm loading shows after render
   expect(screen.getByLabelText(/loading/i)).toBeInTheDocument()
   
-  // resolve and wait for promise to resolve to mock the getCurrentPosition call
+  // update state 
   // make the act warning go away
   // 📜 https://kentcdodds.com/blog/fix-the-not-wrapped-in-act-warning
   // clear all side effects when you call a function that updates the dom
-  await act(async () => {
-    resolve()
-    await promise
+  act(() => {
+    setReturnValue([fakePosition])
   })
 
   // getByLabelText throws if not found so use query here instead for not testing
